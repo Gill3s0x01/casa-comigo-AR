@@ -29,11 +29,6 @@
 </head>
 <body>
 
-  <!-- Botão para liberar áudio -->
-  <button id="startButton">Iniciar Surpresa</button>
-
-  <!-- Música -->
-    <audio id="romanticAudio" src="https://cdn.pixabay.com/audio/2022/10/16/audio_12b6fae5b6.mp3" preload="auto"></audio>
 
   <a-scene 
     embedded
@@ -70,30 +65,7 @@
 
   </a-scene>
 
-  <script>
-    const audio = document.getElementById("romanticAudio");
-    const startButton = document.getElementById("startButton");
-    const marker = document.getElementById("hiroMarker");
 
-    // Primeiro toque do usuário para liberar áudio
-    startButton.addEventListener("click", () => {
-      audio.play().catch(e => console.log("Erro ao tocar música:", e));
-      startButton.style.display = "none";
-    });
-
-    // Quando o marcador aparece, toca a música
-    marker.addEventListener("markerFound", () => {
-      if(audio.paused){
-        audio.play().catch(err => console.log("Erro ao tocar música:", err));
-      }
-    });
-
-    // Quando o marcador some, pausa
-    marker.addEventListener("markerLost", () => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-  </script>
 
 </body>
 </html>
