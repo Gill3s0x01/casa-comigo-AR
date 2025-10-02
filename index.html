@@ -8,16 +8,10 @@
     <style>
       body, html { margin: 0; height: 100%; overflow: hidden; }
       #hint { 
-        position: fixed; 
-        top: 10px; 
-        width: 100%; 
-        text-align: center; 
-        color: white; 
-        font-weight: bold; 
-        z-index: 10; 
-        background: rgba(0,0,0,0.5);
-        padding: 6px;
-        border-radius: 6px;
+        position: fixed; top: 10px; width: 100%; 
+        text-align: center; color: white; font-weight: bold; 
+        z-index: 10; background: rgba(0,0,0,0.5); 
+        padding: 6px; border-radius: 6px;
       }
     </style>
   </head>
@@ -25,17 +19,20 @@
     <div id="hint">Aponte a câmera para o QR 💖</div>
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-      <!-- marcador usando o arquivo .patt -->
+      
+      <!-- Luzes -->
+      <a-entity light="type: ambient; intensity: 1"></a-entity>
+      <a-entity light="type: directional; intensity: 0.8" position="1 1 0"></a-entity>
+      
+      <!-- Marcador -->
       <a-marker type="pattern" url="pattern-abra.patt">
         <a-entity 
-          text="value: Quer casar comigo?; align: center; width: 4; color: #ff4081;"
-          position="0 0.5 0"
-          rotation="-90 0 0">
+          text="value: Quer casar comigo?; align: center; width: 6; color: #ff4081;"
+          position="0 0.2 0"
+          rotation="-90 0 0"
+          scale="2 2 2">
         </a-entity>
       </a-marker>
-
-
-
       
       <a-entity camera></a-entity>
     </a-scene>
