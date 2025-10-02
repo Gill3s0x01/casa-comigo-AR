@@ -1,41 +1,186 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Pedido Especial</title>
-    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.min.js"></script>
-    <style>
-      body, html { margin: 0; overflow: hidden; }
-    </style>
-  </head>
-  <body>
-    <!-- Cena AR -->
-    <a-scene embedded arjs="sourceType: webcam;">
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Pedido AR — Quer casar comigo?</title>
 
-      <!-- ✅ Opção 1: marcador Hiro -->
-      <a-marker preset="hiro">
-        <a-entity 
-          text="value: Quer casar comigo?; align: center; width: 6; color: #ff4081;"
+  <!-- A-Frame + AR.js (raw.githack entrega direto do repo e costuma funcionar) -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    html,body { height:100%; margin:0; font-family:system-ui, Roboto, Arial; background:#000; color:#fff; }
+    .ui {
+      position: fixed; left: 12px; right: 12px; top: 12px; display:flex; gap:8px; z-index:50;
+      align-items:center; justify-content:space-between;
+    }
+    .left { display:flex; gap:8px; align-items:center; }
+    button { background:#ff6ea3; color:#fff; border:0; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+    .hint { background: rgba(0,0,0,0.45); padding:8px 10px; border-radius:8px; font-size:14px; }
+    /* câmera-overlay (fallback) */
+    #cameraOverlay { position:fixed; inset:0; display:none; z-index:20; }
+    #cameraOverlay video { width:100%; height:100%; object-fit:cover; display:block; }
+    #overlayText {
+      position: absolute; left:50%; top:40%; transform:translate(-50%,-50%);
+      font-size: clamp(28px, 8vw, 72px); font-weight:900; text-align:center;
+      color: #ffd1e6; text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+      -webkit-text-stroke: 1px rgba(0,0,0,0.25);
+      pointer-events:none;
+    }
+    /* small helper for reference marker image */
+    .hiro-preview { position: fixed; right: 12px; bottom: 12px; width:120px; height:120px; z-index:50; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.5); }
+    .hiro-preview img{ width:100%; height:100%; object-fit:contain; background:#fff; }
+  </style>
+</head>
+<body>
+  <div class="ui">
+    <div class="left">
+      <button id="btnHiro">Modo Hiro (marcador)</button>
+      <button id="btnCamera">Modo Câmera (overlay)</button>
+      <div class="hint" id="status">Pronto — escolha um modo e permita a câmera.</div>
+    </div>
+    <div style="font-size:13px; opacity:.9">Imprima o marcador <strong>hiro</strong> (link no rodapé).</div>
+  </div>
+
+  <!-- AR Scene (Hiro marker) -->
+  <div id="arContainer" style="width:100%; height:100%; position:fixed; inset:0; z-index:0;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+      <!-- luzes para melhorar visibilidade -->
+      <a-entity light="type: ambient; intensity: 1"></a-entity>
+      <a-entity light="type: directional; intensity: 0.8" position="1 2 1"></a-entity>
+
+      <!-- MARKER HIRO (preset) -->
+      <a-marker preset="hiro" id="hiroMarker">
+        <!-- fundo levemente escuro atrás do texto para contraste -->
+        <a-plane position="0 0.45 -0.05" rotation="-90 0 0" width="2.8" height="0.9" material="color: #000; opacity: 0.38"></a-plane>
+
+        <!-- Texto flutuante -->
+        <a-entity id="arText"
+          text="value: Quer casar comigo?; align: center; width: 6; color: #ffd1e0; shader: msdf; font: https://cdn.aframe.io/fonts/mozillavr.fnt"
           position="0 0.5 0"
           rotation="-90 0 0"
           scale="2 2 2">
         </a-entity>
+
+        <!-- efeito leve de brilho (pequenas esferas) -->
+        <a-entity position="0 0.2 0">
+          <a-sphere position="0.8 0.2 0" radius="0.02" material="color:#ff7aa2; emissive:#ff7aa2; metalness:0.6"></a-sphere>
+          <a-sphere position="-0.8 0.2 0" radius="0.02" material="color:#ff7aa2; emissive:#ff7aa2; metalness:0.6"></a-sphere>
+        </a-entity>
+
       </a-marker>
 
-      <!-- ✅ Opção 2: sem marcador (texto direto na câmera) -->
-      <a-entity 
-        camera
-        look-controls
-        position="0 0 0">
-      </a-entity>
-
-      <a-entity 
-        text="value: Quer casar comigo?; align: center; width: 8; color: #ff4081;"
-        position="0 1.5 -3"
-        scale="3 3 3">
-      </a-entity>
-
+      <!-- câmera (necessária para AR.js) -->
+      <a-entity camera></a-entity>
     </a-scene>
-  </body>
+  </div>
+
+  <!-- Fallback: overlay com vídeo + texto (sem AR) -->
+  <div id="cameraOverlay">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <div id="overlayText">Quer casar comigo?</div>
+  </div>
+
+  <!-- preview do hiro (útil pra imprimir rápido) -->
+  <div class="hiro-preview" title="Hiro marker — imprima e aponte a câmera">
+    <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/three.js/data/hiro.png" alt="Hiro marker">
+  </div>
+
+<script>
+  const btnHiro = document.getElementById('btnHiro');
+  const btnCamera = document.getElementById('btnCamera');
+  const status = document.getElementById('status');
+  const arContainer = document.getElementById('arContainer');
+  const camOverlay = document.getElementById('cameraOverlay');
+  const videoEl = document.getElementById('camVideo');
+  let camStream = null;
+
+  // Start in Hiro mode by default (try)
+  let currentMode = 'hiro';
+
+  function showStatus(text, short=false){
+    status.innerText = text;
+    if(!short) console.log('[PedidoAR]', text);
+  }
+
+  // Toggle to Hiro (AR.js)
+  function useHiro(){
+    // stop overlay camera if active
+    stopOverlayCamera();
+    camOverlay.style.display = 'none';
+    arContainer.style.display = 'block';
+    currentMode = 'hiro';
+    showStatus('Modo Hiro ativo — aponte a câmera para o marcador Hiro impresso.');
+  }
+
+  // Toggle to camera overlay (fallback)
+  function useCameraOverlay(){
+    arContainer.style.display = 'none';
+    camOverlay.style.display = 'block';
+    currentMode = 'camera';
+    // start camera stream for overlay
+    startOverlayCamera();
+    showStatus('Modo Câmera ativo — texto sobreposto diretamente na câmera.');
+  }
+
+  btnHiro.addEventListener('click', () => useHiro());
+  btnCamera.addEventListener('click', () => useCameraOverlay());
+
+  // Start camera stream for overlay mode
+  async function startOverlayCamera(){
+    if(camStream) return;
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } });
+    } catch(e) {
+      // fallback to any camera if environment not available
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      } catch(err) {
+        showStatus('Erro: não foi possível acessar a câmera. Verifique permissões.', false);
+        console.error(err);
+        return;
+      }
+    }
+    videoEl.srcObject = camStream;
+  }
+
+  function stopOverlayCamera(){
+    if(!camStream) return;
+    camStream.getTracks().forEach(t => t.stop());
+    camStream = null;
+    videoEl.srcObject = null;
+  }
+
+  // Listen marker events so we can give feedback to user
+  window.addEventListener('load', () => {
+    const marker = document.getElementById('hiroMarker');
+    if(marker){
+      marker.addEventListener('markerFound', () => {
+        if(currentMode === 'hiro') showStatus('Marcador detectado — olha o pedido! 💍', true);
+      });
+      marker.addEventListener('markerLost', () => {
+        if(currentMode === 'hiro') showStatus('Marcador perdido — posicione o Hiro à frente da câmera.', true);
+      });
+    } else {
+      console.warn('Marker element não encontrado.');
+    }
+
+    // quick check: if browser doesn't support getUserMedia, show message
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showStatus('Seu navegador não suporta câmera via Web (getUserMedia). Tente Chrome no Android.', false);
+    }
+  });
+
+  // Inicializa no modo Hiro tentando ligar a câmera via AR.js
+  // AR.js pedirá permissão automáticamente quando a-scene inicializar
+  useHiro();
+
+  // quando usuário fechar / trocar aba, pare stream overlay
+  window.addEventListener('pagehide', () => stopOverlayCamera());
+  window.addEventListener('beforeunload', () => stopOverlayCamera());
+
+</script>
+
+</body>
 </html>
