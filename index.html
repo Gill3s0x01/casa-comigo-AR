@@ -10,12 +10,11 @@
   <style>body, html { margin:0; padding:0; overflow:hidden; height:100%; }</style>
 </head>
 <body>
-  <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-    
-    <!-- Marcador Hiro -->
-    <a-marker preset="hiro">
+  <a-scene embedded
+    arjs="trackingMethod: best; sourceType: webcam; sourceWidth: 640; sourceHeight: 480; debugUIEnabled: false;"
+    vr-mode-ui="enabled: false">
 
-      <!-- Texto -->
+    <a-marker preset="hiro">
       <a-entity position="0 0.5 0" rotation="0 0 0" scale="0.5 0.5 0.5">
         <a-troika-text
           value="Quer casar comigo?"
@@ -25,12 +24,11 @@
           anchor="center"
           align="center">
         </a-troika-text>
-
       </a-entity>
-
     </a-marker>
 
-    <a-entity camera></a-entity>
+    <a-entity camera="fov: 80" position="0 0 0"></a-entity>
   </a-scene>
+
 </body>
 </html>
