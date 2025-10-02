@@ -19,24 +19,27 @@
     arjs="sourceType: webcam; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
-    <!-- Luz para clarear -->
+    <!-- Luz -->
     <a-entity light="type: ambient; intensity: 1"></a-entity>
-    <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
+    <a-entity light="type: directional; intensity: 0.8" position="1 1 0"></a-entity>
 
     <!-- Marcador Hiro -->
     <a-marker preset="hiro">
 
       <!-- Texto -->
-      <a-entity
-        text="value: Quer casar comigo?; align: center; width: 6; color: #ff69b4; shader: msdf; font: https://cdn.aframe.io/fonts/mozillavr.fnt"
+      <a-text 
+        value="Quer casar comigo?"
+        align="center"
+        color="#ff69b4"
+        width="6"
         position="0 0.5 0"
         rotation="-90 0 0"
         scale="2 2 2">
-      </a-entity>
+      </a-text>
 
     </a-marker>
 
-    <!-- Câmera obrigatória -->
+    <!-- Câmera -->
     <a-entity camera></a-entity>
   </a-scene>
 </body>
