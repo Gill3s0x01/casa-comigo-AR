@@ -8,12 +8,32 @@
   <!-- A-Frame + AR.js -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <!-- Troika Text para 3D -->
-  <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
 
-  <style>body, html { margin:0; padding:0; overflow:hidden; height:100%; }</style>
+  <style>
+    body, html { margin:0; padding:0; overflow:hidden; height:100%; }
+    #startButton {
+      position: absolute;
+      z-index: 999;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff69b4;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Botão para liberar áudio -->
+  <button id="startButton">Iniciar Surpresa</button>
+
+  <!-- Música -->
+  <audio id="romanticAudio" src="sua-musica.mp3" preload="auto"></audio>
 
   <a-scene 
     embedded
@@ -23,16 +43,16 @@
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="hiroMarker">
 
-      <!-- Texto 3D -->
-      <a-entity position="0 0.5 0" rotation="0 0 0" scale="0.5 0.5 0.5">
-        <a-troika-text
-          value="Quer casar comigo?"
-          color="#ff69b4"
-          font-size="0.5"
-          depth="0.1"
-          anchor="center"
-          align="center">
-        </a-troika-text>
+      <!-- Texto normal com animação -->
+      <a-entity position="0 0.5 0" rotation="0 0 0" scale="1 1 1"
+                animation="property: scale; dir: alternate; dur: 1000; loop: true; to: 1.1 1.1 1.1">
+        <a-text 
+          value="Quer casar comigo?" 
+          align="center" 
+          color="#ff69b4" 
+          width="4" 
+          side="double">
+        </a-text>
       </a-entity>
 
     </a-marker>
@@ -42,20 +62,25 @@
 
   </a-scene>
 
-  <!-- Música -->
-  <audio id="romanticAudio" src="sua-musica.mp3"></audio>
-
   <script>
-    // Quando o marcador Hiro for detectado, toca a música
-    const marker = document.querySelector("#hiroMarker");
-    const audio = document.querySelector("#romanticAudio");
+    const audio = document.getElementById("romanticAudio");
+    const startButton = document.getElementById("startButton");
+    const marker = document.getElementById("hiroMarker");
 
+    // Primeiro toque do usuário para liberar áudio
+    startButton.addEventListener("click", () => {
+      audio.play().catch(e => console.log("Erro ao tocar música:", e));
+      startButton.style.display = "none";
+    });
+
+    // Quando o marcador aparece, toca a música
     marker.addEventListener("markerFound", () => {
       if(audio.paused){
-        audio.play().catch(err => console.log("Erro ao tocar áudio:", err));
+        audio.play().catch(err => console.log("Erro ao tocar música:", err));
       }
     });
 
+    // Quando o marcador some, pausa
     marker.addEventListener("markerLost", () => {
       audio.pause();
       audio.currentTime = 0;
