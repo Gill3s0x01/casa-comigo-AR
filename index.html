@@ -2,10 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quer casar comigo?</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <style>body, html { margin:0; padding:0; overflow:hidden; height:100%; }</style>
 </head>
@@ -14,20 +13,20 @@
     
     <!-- Marcador Hiro -->
     <a-marker preset="hiro">
-      <a-entity position="0 0.5 0" rotation="0 0 0" scale="0.5 0.5 0.5">
-        <a-troika-text
-          value="Quer casar comigo?"
-          color="#ff69b4"
-          font-size="0.8"
-          depth="0.1"
-          anchor="center"
-          align="center">
-        </a-troika-text>
-      </a-entity>
-    </a-marker>
 
+      <!-- Texto -->
+      <a-entity position="0 0.5 0" rotation="0 0 0" scale="0.5 0.5 0.5">
+        <a-text 
+          value="Quer casar comigo?" 
+          align="center" 
+          color="#ff69b4" 
+          width="6" 
+          side="double">
+        </a-text>
+      </a-entity>
+
+    </a-marker>
     <a-entity camera="fov: 80" position="0 0 0"></a-entity>
   </a-scene>
-
 </body>
 </html>
