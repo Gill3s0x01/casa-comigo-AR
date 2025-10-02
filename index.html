@@ -9,7 +9,20 @@
   <style>body, html { margin:0; padding:0; overflow:hidden; height:100%; }</style>
 </head>
 <body>
-  <a-scene embedded arjs="trackingMethod: best; sourceType: environment; debugUIEnabled: false;">
+  <script>
+    // Detecta se é mobile
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    var arjsSourceType = isMobile() ? 'environment' : 'webcam';
+    document.addEventListener('DOMContentLoaded', function() {
+      var scene = document.getElementById('ar-scene');
+      if (scene) {
+        scene.setAttribute('arjs', 'trackingMethod: best; sourceType: ' + arjsSourceType + '; debugUIEnabled: false;');
+      }
+    });
+  </script>
+  <a-scene id="ar-scene" embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
     
     <!-- Marcador Hiro -->
     <a-marker preset="hiro">
