@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Quer casar comigo? — VR</title>
+  <meta name="description" content="Pedido de casamento em 3D + modo VR. Abra este link no celular (ex.: a partir de um QR) e entre no modo VR para ver o texto." />
+  <!-- A-Frame (WebVR/WebXR friendly) -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .overlay{position:fixed;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;z-index:10}
+    .btn{background:linear-gradient(180deg,#ff7aa2,#ff507a);border:none;padding:10px 14px;border-radius:12px;color:white;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+    .small{font-size:14px;opacity:.95}
+    .hint{position:fixed;left:12px;bottom:12px;color:#ddd;font-size:13px;z-index:10}
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <button class="btn" id="enterVr">Entrar em VR</button>
+    <div class="small">Abra pelo celular (QR → este link). Toque em "Entrar em VR" para modo imersivo.</div>
+  </div>
+  <div class="hint">Dica: use Chrome em Android para melhor compatibilidade WebXR.</div>
+
+  <a-scene background="color: #071428" vr-mode-ui="enterVRButton: #enterVr">
+    <!-- Camera + cursor for non-VR interaction -->
+    <a-entity id="cameraRig">
+      <a-entity id="camera" camera look-controls position="0 1.6 0">
+        <a-entity cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable" position="0 0 -1" geometry="primitive: ring; radiusInner:0.01; radiusOuter:0.02" material="color: #fff; shader: flat"></a-entity>
+      </a-entity>
+    </a-entity>
+
+    <!-- Lighting -->
+    <a-entity light="type: ambient; intensity: 0.35"></a-entity>
+    <a-entity light="type: directional; intensity: 0.9" position="-1 2 1"></a-entity>
+    <a-entity light="type: point; intensity: 0.6; distance: 10" position="0 3 -1"></a-entity>
+
+    <!-- Ground subtle reflection -->
+    <a-entity geometry="primitive: plane; width: 40; height: 40" rotation="-90 0 0" position="0 0 0" material="color: #05060a; metalness: 0.2; roughness: 0.95"></a-entity>
+
+    <!-- Floating 3D-style text: layered to give depth -->
+    <a-entity position="0 1.6 -2" rotation="0 0 0" id="textoGroup">
+      <!-- back shadow layer (slightly behind and darker) -->
+      <a-entity text="value: Quer casar comigo?; align: center; width: 6; color: #2b2530; font: https://cdn.aframe.io/fonts/mozillavr.fnt" position="0 0.02 -0.04" rotation="0 0 0" scale="1 1 1"></a-entity>
+      <!-- middle layer for depth -->
+      <a-entity text="value: Quer casar comigo?; align: center; width: 6; color: #ffebf0; font: https://cdn.aframe.io/fonts/mozillavr.fnt" position="0 0 0" rotation="0 0 0" scale="1 1 1"></a-entity>
+      <!-- front shine (slightly forward) -->
+      <a-entity text="value: Quer casar comigo?; align: center; width: 6; color: #ffd1e0; font: https://cdn.aframe.io/fonts/mozillavr.fnt" position="0 -0.02 0.04" rotation="0 0 0" scale="1 1 1"></a-entity>
+    </a-entity>
+
+    <!-- Heart particle / sparkle effect -->
+    <a-entity id="hearts" position="0 1 -1" particle-system="preset: dust; particleCount: 60; size: 0.05; color: #ff79a6, #ffd1e0; velocityValue: 0 0.3 0; accelerationValue: 0 -0.05 0"></a-entity>
+
+    <!-- Subtle rotation animation on the group -->
+    <a-animation attribute="rotation" to="0 360 0" dur="20000" repeat="indefinite" easing="linear" begin=""></a-animation>
+
+    <!-- Optional: a simple button inside scene to replay sparkle -->
+    <a-entity id="replay" geometry="primitive: plane; width: 0.6; height: 0.18" material="color:#ff7aa2; opacity:0.95" position="0 0.5 -1.2" class="clickable">
+      <a-entity text="value: Repetir efeito; align:center; width:1.6; color:#fff;" position="0 0 0.01"></a-entity>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    // Ensure the VR button triggers A-Frame enter VR
+    document.getElementById('enterVr').addEventListener('click', function(){
+      const scene = document.querySelector('a-scene');
+      if(scene && scene.enterVR) scene.enterVR();
+    });
+
+    // Replay particle effect when clicking the in-scene button (for non-VR too)
+    document.querySelectorAll('.clickable').forEach(el => {
+      el.addEventListener('click', () => {
+        const ps = document.querySelector('#hearts');
+        if (!ps) return;
+        // restart particle system by detaching/attaching
+        const parent = ps.parentNode;
+        const clone = ps.cloneNode(true);
+        parent.removeChild(ps);
+        setTimeout(()=> parent.appendChild(clone), 50);
+      });
+    });
+
+    // Small compatibility hint for iOS: show native full-screen prompt only if needed
+    window.addEventListener('load', ()=>{
+      // autofocus mobile: try to enter inline full-screen for better immersion
+      // Note: most browsers require a user gesture to enter immersive mode.
+    });
+  </script>
+</body>
+</html>
