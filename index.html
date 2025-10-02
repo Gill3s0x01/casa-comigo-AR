@@ -4,42 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tenho uma surpresa!</title>
+
+  <!-- A-Frame + AR.js -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <!-- Troika Text para 3D -->
+  <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
+
   <style>body, html { margin:0; padding:0; overflow:hidden; height:100%; }</style>
 </head>
 <body>
-  <script>
-    // Detecta se é mobile
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    var arjsSourceType = isMobile() ? 'environment' : 'webcam';
-    document.addEventListener('DOMContentLoaded', function() {
-      var scene = document.getElementById('ar-scene');
-      if (scene) {
-        scene.setAttribute('arjs', 'trackingMethod: best; sourceType: ' + arjsSourceType + '; debugUIEnabled: false;');
-      }
-    });
-  </script>
-  <a-scene id="ar-scene" embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-    
-    <!-- Marcador Hiro -->
-    <a-marker preset="hiro">
 
-      <!-- Texto -->
+  <a-scene 
+    embedded
+    vr-mode-ui="enabled: false"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+
+    <!-- Marcador Hiro -->
+    <a-marker preset="hiro" id="hiroMarker">
+
+      <!-- Texto 3D -->
       <a-entity position="0 0.5 0" rotation="0 0 0" scale="0.5 0.5 0.5">
-        <a-text 
-          value="Quer casar comigo?" 
-          align="center" 
-          color="#ff69b4" 
-          width="6" 
-          side="double">
-        </a-text>
+        <a-troika-text
+          value="Quer casar comigo?"
+          color="#ff69b4"
+          font-size="0.5"
+          depth="0.1"
+          anchor="center"
+          align="center">
+        </a-troika-text>
       </a-entity>
 
     </a-marker>
+
+    <!-- Câmera -->
     <a-entity camera="fov: 80" position="0 0 0"></a-entity>
+
   </a-scene>
+
+  <!-- Música -->
+  <audio id="romanticAudio" src="sua-musica.mp3"></audio>
+
+  <script>
+    // Quando o marcador Hiro for detectado, toca a música
+    const marker = document.querySelector("#hiroMarker");
+    const audio = document.querySelector("#romanticAudio");
+
+    marker.addEventListener("markerFound", () => {
+      if(audio.paused){
+        audio.play().catch(err => console.log("Erro ao tocar áudio:", err));
+      }
+    });
+
+    marker.addEventListener("markerLost", () => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  </script>
+
 </body>
 </html>
